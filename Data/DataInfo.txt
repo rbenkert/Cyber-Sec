@@ -1,0 +1,36 @@
+Each run was 5 minutes long with 500 millisecond sampling.
+
+Normal Scenario:
+Tank starts empty. Tank begins to fill with fill valve velocity 6. 
+When tank reaches level 7, fill valve velocity remains 6 and discharge valve velocity becomes 6.
+After the first 4 rounds, the fill valve velocity decreases, imitating a leak.
+
+Normal 1: Fill Valve Velocity = 6
+Normal 2: Fill Valve Velocity = 6
+Normal 3: Fill Valve Velocity = 6
+Normal 4: Fill Valve Velocity = 6
+Normal 5: Fill Valve Velocity = 5.8
+Normal 6: Fill Valve Velocity = 5.7
+Normal 7: Fill Valve Velocity = 5.6
+Normal 8: Fill Valve Velocity = 5.4
+Normal 9: Fill Valve Velocity = 5.3
+Normal 10: Fill Valve Velocity = 5.0
+
+Compromised Scenario:
+Tank starts empty. Tank begins to fill with fill valve velocity 6.
+When it reaches level 7, fill valve velocity remains 6 and discharge valve velocity becomes 6.
+After the first 4 rounds, the fill valve velocity increases, imitating an attacker trying to cause an overflow.
+
+
+Normal 1: Fill Valve Velocity = 6
+Normal 2: Fill Valve Velocity = 6
+Normal 3: Fill Valve Velocity = 6
+Normal 4: Fill Valve Velocity = 6
+Normal 5: Fill Valve Velocity = 6.4
+Normal 6: Fill Valve Velocity = 6.8
+Normal 7: Fill Valve Velocity = 7.2
+Normal 8: Fill Valve Velocity = 7.6
+Normal 9: Fill Valve Velocity = 8.0
+Normal 10: Fill Valve Velocity = 8.4
+
+
