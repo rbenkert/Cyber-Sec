@@ -1,0 +1,7 @@
+Each run is 4 minutes long, with sampling every 250 milliseconds.
+
+Normal scenario:
+Boxes are moved from a conveyor belt to a palette on another conveyor belt.
+3 boxes are stacked on each palette. This happens 4 times during each run.
+
+
