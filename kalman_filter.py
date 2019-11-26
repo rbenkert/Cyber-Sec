@@ -35,6 +35,7 @@ def fill_up_create_model(initial_height, target, time_step, velocity, noise, sta
     #if len_on != 0: len_on += 1
     return states, measurements, len_on
 
+
 def create_estimate(initial_height, length, time_step, velocity, state_noise):
     old_state = initial_height
     states = np.array([[initial_height]])
@@ -77,9 +78,9 @@ def create_track_kf(measurements, transition_matrix, observation_matrix, init_st
 
     return estim_state
 
-def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, transition_matr, obs_matr, target=15.0, len_sim=150, time_step=0.2, state_noise=0.02, measurement_noise=0.3):
+def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, transition_matr, obs_matr, target=15.0, len_sim=150, time_step=0.2, state_noise=0.02, measurement_noise=0.3, sim=False, path='Data/NormalScenario/'):
     #metaparameters
-    show = True
+    show = False
     res_array = np.empty(1)
 
     #init velocity dropping
@@ -99,15 +100,28 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
     filtered_mean, filtered_covar = vel_kf.filter(vel_measurements)
 
     for t in range(iter):
+
         #ground truth
-        true_states, measurements, len_on = fill_up_create_model(0.0, target, time_step, vel_hist[t], measurement_noise, state_noise)
-        len_off = len_sim - len_on
-        if len_off > 0:
-            phase_off, phase_off_meas = create_velocity_model(true_states[-1, 0], len_off, time_step, 0.0, measurement_noise, state_noise)
-            true_states = np.vstack([true_states, phase_off])
-            measurements = np.vstack([measurements, phase_off_meas])
+        if sim:
+            #self created data
+            true_states, measurements, len_on = fill_up_create_model(0.0, target, time_step, vel_hist[t],
+                                                                     measurement_noise, state_noise)
+            len_off = len_sim - len_on
+            if len_off > 0:
+                phase_off, phase_off_meas = create_velocity_model(true_states[-1, 0], len_off, time_step, 0.0,
+                                                                  measurement_noise, state_noise)
+                true_states = np.vstack([true_states, phase_off])
+                measurements = np.vstack([measurements, phase_off_meas])
+            else:
+                measurements = measurements[0:(len_sim + 1), :]
         else:
-            measurements = measurements[0:(len_sim+1),:]
+            h_path = path + 'FillingTankHeight' + str(t+1) + '.txt'
+            t_path = path + 'FillingTankTime' + str(t+1) + '.txt'
+            height = np.loadtxt(h_path)
+            time = np.loadtxt(t_path)
+
+            measurements = np.reshape(height, (height.shape[0], -1))
+
 
         #our estimate of the ground truth
         if t<4:
@@ -115,21 +129,25 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
         else:
             filtered_mean, filtered_covar = vel_kf.filter(vel_measurements)
             cur_velocity = next_mean[0]
+        print('Current velocity used for estimate:  %f' %cur_velocity)
         our_states, len_on_ours = create_estimate_fill(0.0, target, time_step, cur_velocity, state_noise)
-        len_off_ours = len_sim - len_on_ours
+        if sim: len_off_ours = len_sim - len_on_ours
+        else: len_off_ours = time.shape[0] - len_on_ours
         if len_off_ours > 0:
             phase2_ours = create_estimate(our_states[-1, 0], len_off_ours, time_step, 0, state_noise)
             our_states = np.vstack([our_states, phase2_ours])
         else:
-            our_states = our_states[0:(len_sim+1), :]
+            our_states = our_states[0:time.shape[0], :]
 
         #generate track
+        print('Generating Track...')
         track = create_track_kf(measurements, transition_matr, obs_matr)
         velocities = track[:,1]
         estim_states = track[:,0]
 
         #average vel
         average_velocity = np.sum(velocities[0:len_on_ours])/len_on_ours
+        print('Average Velocity:    %f' %average_velocity)
         if t>= 3:
             vel_measurements = np.vstack([vel_measurements, [average_velocity]])
             next_mean, next_covariance = vel_kf.filter_update(filtered_mean[-1], filtered_covar[-1], vel_measurements[t])
@@ -148,24 +166,26 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
 
         #showing possibility
         if show:
-            t = np.arange(0.0, (len_sim+1)*time_step, time_step)
+            if sim: t = np.arange(0.0, (len_sim+1)*time_step, time_step)
+            else: t = np.arange(0.0, time.shape[0]*time_step, time_step)
             meas = True
             ours = True
             kalman = True
-            ground_truth = True
+            #ground truth only works when sim is on
+            ground_truth = False
             meas_plot = measurements[:,0]
             meas_plot = np.reshape(meas_plot,-1)
             if meas: plt.scatter(t, meas_plot, color='red')
-            if ours: plt.plot(t, our_states[0:(len_sim+1),0], color='purple')
-            if kalman: plt.plot(t, track[0:(len_sim+1),0], color='green')
+            if ours: plt.plot(t, our_states[0:t.shape[0],0], color='purple')
+            if kalman: plt.plot(t, track[0:t.shape[0],0], color='green')
             # plt.plot(t, state, color= 'red')
-            if ground_truth: plt.plot(t, true_states[0:(len_sim+1),0])
+            if ground_truth: plt.plot(t, true_states[0:t.shape[0],0])
             plt.show()
     plt.figure(1)
     t = np.arange(0, iter, 1)
     plt.plot(t, vel_states, color='green')
     plt.scatter(t, vel_measurements, color='red')
-    plt.plot(t, vel_hist)
+    #plt.plot(t, vel_hist)
     plt.figure(2)
     t = np.arange(0, iter+1, 1)
     plt.plot(t, res_array)
