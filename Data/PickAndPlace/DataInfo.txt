@@ -4,4 +4,63 @@ Normal scenario:
 Boxes are moved from a conveyor belt to a palette on another conveyor belt.
 3 boxes are stacked on each palette. This happens 4 times during each run.
 
+First 4 runs are the same, operating normally.
+In the last 6 runs, the x, y, and z values of each state are varied slightly.
+Run 1-4: 
+State 3: 	box1 spX = 3.1, box1 spY = 3.8
+			box2 spX = 3.1, box2 spY = 6.7
+			box3 spX = 3.1, box3 spY = 5.3
+State 4: 	box1/2 spZ = 10
+			box3 spZ = 5
+		
+Run 5:
+State 3: 	box1 spX = 0, box1 spY = -0.4
+			box2 spX = 0.5, box2 spY = 0
+			box3 spX = -0.3, box3 spY = 0
+State 4: 	box1/2 spZ = 0.4
+			box3 spZ = 0.3
+			
+Run 6:
+State 3: 	box1 spX = 0.8, box1 spY = 0.7
+			box2 spX = 0.6, box2 spY = -0.9
+			box3 spX = 0.8, box3 spY = 0.4
+State 4: 	box1/2 spZ = 0.4
+			box3 spZ = -0.9
+			
+Run 7:
+State 3: 	box1 spX = 1.5, box1 spY = 0.7
+			box2 spX = -0.8, box2 spY = -1.5
+			box3 spX = -1.2, box3 spY = 1.4
+State 4: 	box1/2 spZ = -0.8
+			box3 spZ = 0.8
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+Run 8:
+State 3: 	box1 spX = -1.9, box1 spY = 1.1
+			box2 spX = -1.4, box2 spY = 1.7
+			box3 spX = -1.6, box3 spY = -1.5
+State 4: 	box1/2 spZ = -1.2
+			box3 spZ = -1.5
+			
+Run 9:
+State 3: 	box1 spX = 1.9, box1 spY = 2.1
+			box2 spX = 1.6, box2 spY = 1.5
+			box3 spX = 2.0, box3 spY = 1.2
+State 4: 	box1/2 spZ = 1.9
+			box3 spZ = -2.0
+			
+Run 10:
+State 3: 	box1 spX = -2.4, box1 spY = 2.1
+			box2 spX = 1.5, box2 spY = -2.9
+			box3 spX = 1.6, box3 spY = 2.2
+State 4: 	box1/2 spZ = 2.3
+			box3 spZ = -1.7
 
