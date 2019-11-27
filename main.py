@@ -1,32 +1,53 @@
 import kalman_filter as myKalman
 import numpy as np
 import matplotlib.pyplot as plt
-
+import utils
 
 
 
 
 
 if __name__ == '__main__':
-    time_step = 0.1
+    time_step = 500
     len_on = 100
     len_off = 50
     len_sim = 150
-    target = 50.0
+    target = 7
 
     #states and measurements
-    velocity = 5.0
-    measurement_noise = 0.8
-    state_transition_noise = 0.06
+    start_vel1 = 5.04588796e-05
+    start_vel2 = 5.02531426e-05
+    measurement_noise = 0
+    state_transition_noise = 0
     start_of_change = 4
     iter = 10
-    change_rate = 0.8
+    change_rate = 0.2
 
     #kf parameters
     transition_matrix = [[1, time_step], [0, 1]]
     observation_matrix = [[1, 0]]
 
-    myKalman.simualate_multiple_runs(iter, velocity, change_rate, start_of_change, transition_matrix, observation_matrix, target, len_sim, time_step, state_transition_noise, measurement_noise)
+    myKalman.simualate_multiple_runs(iter, start_vel1, change_rate, start_of_change, transition_matrix, observation_matrix, target, len_sim, time_step, state_transition_noise, measurement_noise)
+    height = np.loadtxt('Data/NormalScenario/FillingTankHeight1.txt')
+    time = np.loadtxt('Data/NormalScenario/FillingTankTime1.txt')
+
+    height = np.reshape(height, (height.shape[0], -1))
+
+    tr_matrix = [[1, 300], [0, 1]]
+    obs_matrix = [[1, 0]]
+    v1 = (height[250]-height[166])/(time[250]-time[166])
+    v2 = (height[280]-height[180])/(time[280]-time[180])
+    print(v1)
+    print(v2)
+    #for i in range()
+
+    #track = myKalman.create_track_kf(height, tr_matrix, obs_matrix)
+    #estim_height = track[:,0]
+
+
+    plt.scatter(time, height)
+    #plt.plot(time, estim_height, color='green')
+    plt.show()
 
 
 
