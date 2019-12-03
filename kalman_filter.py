@@ -78,17 +78,10 @@ def create_track_kf(measurements, transition_matrix, observation_matrix, init_st
 
     return estim_state
 
-def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, transition_matr, obs_matr, target=15.0, len_sim=150, time_step=0.2, state_noise=0.02, measurement_noise=0.3, sim=False, path='Data/NormalScenario/'):
+def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, transition_matr, obs_matr, target=15.0, len_sim=150, time_step=0.2, state_noise=0.02, measurement_noise=0.3, sim=False, path='Data/FillingTank/NormalScenario/'):
     #metaparameters
-    show = False
+    show = True
     res_array = np.empty(1)
-
-    #init velocity dropping
-    vel_hist = np.array([start_velocity])
-    for i in range(1,start_of_change):
-        vel_hist = np.append(vel_hist, start_velocity)
-    for i in range(start_of_change, iter):
-        vel_hist = np.append(vel_hist, vel_hist[-1]-change_rate)
 
     #initialize velocity measurements and kalman filter
     vel_trmatr = [[1, 1], [0, 1]]
@@ -139,6 +132,7 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
         else:
             our_states = our_states[0:time.shape[0], :]
 
+        #if t==0: org = our_states
         #generate track
         print('Generating Track...')
         track = create_track_kf(measurements, transition_matr, obs_matr)
@@ -156,13 +150,11 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
 
         #logging params
         residuals = np.square(our_states-estim_states)
-        residual = np.amax(residuals)
-        vel_error = (cur_velocity-vel_hist[i])**2
+        residual = np.amax(residuals)/np.average(residuals)
 
         res_array = np.append(res_array, residual)
         print('Finished iteration %d!' %t)
         print('Max Residual:              %f' %residual)
-        print('Square Error of velocity:  %f' %vel_error)
 
         #showing possibility
         if show:
@@ -175,20 +167,28 @@ def simualate_multiple_runs(iter, start_velocity, change_rate, start_of_change, 
             ground_truth = False
             meas_plot = measurements[:,0]
             meas_plot = np.reshape(meas_plot,-1)
-            if meas: plt.scatter(t, meas_plot, color='red')
-            if ours: plt.plot(t, our_states[0:t.shape[0],0], color='purple')
-            if kalman: plt.plot(t, track[0:t.shape[0],0], color='green')
+            if meas: plt.scatter(t, meas_plot, color='red', label='Measurements')
+            if ours:
+                plt.plot(t, our_states[0:t.shape[0],0], color='purple', label='Prediction')
+                #plt.plot(t, org[0:t.shape[0],0], label='Not generalized')
+            if kalman: plt.plot(t, track[0:t.shape[0],0], color='green', label='Track')
             # plt.plot(t, state, color= 'red')
             if ground_truth: plt.plot(t, true_states[0:t.shape[0],0])
+            plt.legend(loc='upper left')
+            plt.xlabel('Time')
+            plt.ylabel('Height')
             plt.show()
     plt.figure(1)
     t = np.arange(0, iter, 1)
     plt.plot(t, vel_states, color='green')
     plt.scatter(t, vel_measurements, color='red')
-    #plt.plot(t, vel_hist)
+    plt.xlabel('Iteration')
+    plt.ylabel('Velocity')
     plt.figure(2)
     t = np.arange(0, iter+1, 1)
     plt.plot(t, res_array)
+    plt.xlabel('Iteration')
+    plt.ylabel('Maxresidual')
     plt.show()
 
 

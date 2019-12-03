@@ -2,20 +2,21 @@ import kalman_filter as myKalman
 import numpy as np
 import matplotlib.pyplot as plt
 import utils
+import pickandplace as pap
 
 
 
 
 
 if __name__ == '__main__':
-    time_step = 500
+    time_step = 250
     len_on = 100
     len_off = 50
     len_sim = 150
     target = 7
 
     #states and measurements
-    start_vel1 = 5.04588796e-05
+    start_vel1 = 9.713371428571428e-05
     start_vel2 = 5.02531426e-05
     measurement_noise = 0
     state_transition_noise = 0
@@ -27,27 +28,33 @@ if __name__ == '__main__':
     transition_matrix = [[1, time_step], [0, 1]]
     observation_matrix = [[1, 0]]
 
-    myKalman.simualate_multiple_runs(iter, start_vel1, change_rate, start_of_change, transition_matrix, observation_matrix, target, len_sim, time_step, state_transition_noise, measurement_noise)
-    height = np.loadtxt('Data/NormalScenario/FillingTankHeight1.txt')
-    time = np.loadtxt('Data/NormalScenario/FillingTankTime1.txt')
+    #myKalman.simualate_multiple_runs(iter, start_vel1, change_rate, start_of_change, transition_matrix, observation_matrix, target, len_sim, time_step, state_transition_noise, measurement_noise, path='Data/FillingTank/CompromisedScenario/')
 
-    height = np.reshape(height, (height.shape[0], -1))
+    beginn = 83
+    beginnz = 97
 
-    tr_matrix = [[1, 300], [0, 1]]
-    obs_matrix = [[1, 0]]
-    v1 = (height[250]-height[166])/(time[250]-time[166])
-    v2 = (height[280]-height[180])/(time[280]-time[180])
-    print(v1)
-    print(v2)
-    #for i in range()
+    timex1_8 = 26
+    timex1_3 = 36
 
-    #track = myKalman.create_track_kf(height, tr_matrix, obs_matrix)
-    #estim_height = track[:,0]
+    posx =[8.3, 3.1]
+    times_at_posx = [48, 48]
+
+    posy = [5.5, 3.8, 5.5, 6.7, 5.5, 5.3]
+    times_at_posy = [39, 50, 36, 59, 39, 64]
 
 
-    plt.scatter(time, height)
-    #plt.plot(time, estim_height, color='green')
-    plt.show()
+    velocityup_in_steps=8.29116/20
+
+    velocitydown_in_steps = (8.29116-3.106) / 20
+
+    start_pos = [posx, posy]
+    start_times = [times_at_posx, times_at_posy]
+
+    pap.simualate_multiple_runs(iter, start_pos, start_times, transition_matrix, observation_matrix, velocityup_in_steps, velocitydown_in_steps, beginn)
+
+
+
+
 
 
 
